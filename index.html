@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Chatbot</title>
+
+  <link rel="stylesheet" type="text/css" href="style.css">
+
+</head>
+<body>
+
+  <div class="chatbox">
+
+    <div class="chat-messages">
+      <!-- Chat messages will go here -->
+    </div>
+
+    <div class="chat-input">
+      <form id="chat-form">
+        <input type="text" placeholder="Talk to me..." id="chat-text">
+        <button type="submit">Send</button>
+      </form>
+    </div>
+
+  </div>
+
+  <script>
+    // JavaScript code to connect frontend to backend
+
+    const chatMessages = document.querySelector('.chat-messages');
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-text');
+
+    // Fetch response from backend
+    async function getResponse(text) {
+      const response = await fetch('/chatbot?message=' + encodeURIComponent(text));
+      const data = await response.json();
+      return data.reply; 
+    }
+
+    // Submit handler for sending messages
+    chatForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      // Get user text input
+      const message = chatInput.value; 
+
+      // Reset input 
+      chatInput.value = ''; 
+
+      // Display user's message
+      displayMessage(message, 'user');
+
+      // Get response from backend
+      getResponse(message).then(res => {
+        displayMessage(res, 'bot');
+      });
+
+    });
+
+    // Display message in chat window 
+    function displayMessage(text, sender) {
+      const msg = `
+        <div class="chat-bubble ${sender}">${text}</div>
+      `;
+
+      chatMessages.innerHTML += msg;
+
+      // Scroll to bottom of chat
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+  </script>
+
+</body>
+</html>
